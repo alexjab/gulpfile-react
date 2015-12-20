@@ -1,3 +1,6 @@
+// Gist fork: https://gist.github.com/alexjab/6253c4482d4a7c102875
+// GitHub repo: https://github.com/alexjab/gulpfile-react
+
 const path = require('path');
 
 const source = require('vinyl-source-stream');
