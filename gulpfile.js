@@ -1,5 +1,3 @@
-// Update: Hey Folks - I've got a full Gulpfile with everything else over at https://github.com/wesbos/React-For-Beginners-Starter-Files
-
 var source = require('vinyl-source-stream');
 var gulp = require('gulp');
 var gutil = require('gulp-util');
@@ -9,6 +7,8 @@ var babelify = require('babelify');
 var watchify = require('watchify');
 var notify = require('gulp-notify');
 
+var srcDir = './src/';
+var dstDir = './lib/';
 
 function handleErrors() {
   var args = Array.prototype.slice.call(arguments);
@@ -22,9 +22,14 @@ function handleErrors() {
 function buildScript(file, watch) {
   
   var props = {
-    entries: ['./scripts/' + file],
+    entries: [srcDir + file],
     debug : true,
-    transform:  [babelify, reactify]
+    transform: [
+      [ babelify, {presets: ['es2015', 'react']} ]
+    ],
+    cache: {},
+    packageCache: {},
+    fullPaths: true
   };
 
   // watchify() if watch requested, otherwise run browserify() once 
@@ -35,7 +40,7 @@ function buildScript(file, watch) {
     return stream
       .on('error', handleErrors)
       .pipe(source(file))
-      .pipe(gulp.dest('./build/'));
+      .pipe(gulp.dest(dstDir));
   }
 
   // listen for an update and run rebundle
