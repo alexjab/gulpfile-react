@@ -1,0 +1,32 @@
+{
+  "name": "gulpfile-react",
+  "version": "0.1.0",
+  "description": "A gulpfile for React projects",
+  "main": "gulpfile.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://gist.github.com/6253c4482d4a7c102875.git"
+  },
+  "author": "alexjab <alexandre.jablon@gmail.com> (http://jablon.me/)",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://gist.github.com/6253c4482d4a7c102875"
+  },
+  "homepage": "https://gist.github.com/6253c4482d4a7c102875",
+  "dependencies": {
+    "babelify": "^7.2.0",
+    "browserify": "^12.0.1",
+    "gulp": "^3.9.0",
+    "gulp-if": "^2.0.0",
+    "gulp-notify": "^2.2.0",
+    "gulp-uglify": "^1.5.1",
+    "gulp-util": "^3.0.7",
+    "reactify": "^1.1.1",
+    "vinyl-buffer": "^1.0.0",
+    "vinyl-source-stream": "^1.1.0",
+    "watchify": "^3.6.1"
+  }
+}

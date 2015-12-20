@@ -1,17 +1,26 @@
-var source = require('vinyl-source-stream');
-var gulp = require('gulp');
-var gutil = require('gulp-util');
-var browserify = require('browserify');
-var reactify = require('reactify');
-var babelify = require('babelify');
-var watchify = require('watchify');
-var notify = require('gulp-notify');
+const path = require('path');
 
-var srcDir = './src/';
-var dstDir = './lib/';
+const source = require('vinyl-source-stream');
+const gulp = require('gulp');
+const gutil = require('gulp-util');
+const browserify = require('browserify');
+const reactify = require('reactify');
+const babelify = require('babelify');
+const watchify = require('watchify');
+const notify = require('gulp-notify');
+const buffer = require('vinyl-buffer');
+const uglify = require('gulp-uglify');
+const gulpIf = require('gulp-if');
+
+const srcDir = './src/';
+const dstDir = './lib/';
+const srcFile = 'App.react.js';
+const dstFile = 'app.js';
+
+const isProduction = process.env.NODE_ENV === 'production';
 
 function handleErrors() {
-  var args = Array.prototype.slice.call(arguments);
+  const args = Array.prototype.slice.call(arguments);
   notify.onError({
     title: 'Compile Error',
     message: '<%= error.message %>'
@@ -21,25 +30,26 @@ function handleErrors() {
 
 function buildScript(file, watch) {
   
-  var props = {
-    entries: [srcDir + file],
-    debug : true,
+  const props = {
+    entries: [path.join(srcDir, file)],
+    debug : !isProduction,
     transform: [
-      [ babelify, {presets: ['es2015', 'react']} ]
+      [ babelify, { presets: ['es2015', 'react'] } ]
     ],
     cache: {},
     packageCache: {},
     fullPaths: true
   };
 
-  // watchify() if watch requested, otherwise run browserify() once 
-  var bundler = watch ? watchify(browserify(props)) : browserify(props);
+  const bundler = watch ? watchify(browserify(props)) : browserify(props);
 
   function rebundle() {
-    var stream = bundler.bundle();
+    const stream = bundler.bundle();
     return stream
       .on('error', handleErrors)
       .pipe(source(file))
+      .pipe(gulpIf(isProduction, buffer()))
+      .pipe(gulpIf(isProduction, uglify()))
       .pipe(gulp.dest(dstDir));
   }
 
@@ -54,12 +64,24 @@ function buildScript(file, watch) {
 }
 
 
-// run once
-gulp.task('scripts', function() {
-  return buildScript('app.js', false);
+// Run once.
+gulp.task('build', function() {
+  return buildScript(srcFile, false);
 });
 
-// run 'scripts' task first, then watch for future changes
-gulp.task('default', ['scripts'], function() {
-  return buildScript('app.js', true);
+// Watch source file.
+// To watch in `production` mode,
+// you need to run `gulp watch` explicitely.
+gulp.task('watch', function() {
+  return buildScript(srcFile, true);
 });
+
+// If this is production, just build.
+// If not, build and then watch.
+// To build in production mode, and then watch,
+// just run `gulp watch` explicitely.
+gulp.task('default', ['build'], function() {
+  if (isProduction) return;
+  return buildScript(srcFile, true);
+});
+
